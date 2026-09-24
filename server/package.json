@@ -4,7 +4,7 @@
   "private": true,
   "main": "dist/index.js",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "tsc && node --watch dist/index.js",
     "build": "tsc",
     "start": "node dist/index.js",
     "test": "tsc test/api.test.ts --outDir dist-test --module CommonJS --target ES2022 --moduleResolution node --esModuleInterop && node dist-test/test/api.test.js && rm -rf dist-test data/tasks.db*"
