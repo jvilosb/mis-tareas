@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <linearGradient id="navGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00205B" />
+      <stop offset="100%" stop-color="#0d2f70" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#71a0ff" />
+      <stop offset="100%" stop-color="#2b67f6" />
+    </linearGradient>
+  </defs>
+  <!-- Base redondeada con estilo getram -->
+  <rect width="100" height="100" rx="26" fill="url(#navGrad)" />
+  <!-- Borde suave -->
+  <rect x="2" y="2" width="96" height="96" rx="24" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="2" />
+  
+  <!-- Checkmark y calendario estilizado -->
+  <path d="M28 50 L42 64 L72 34" fill="none" stroke="url(#accentGrad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+  <!-- Punto de pulso vivo -->
+  <circle cx="74" cy="26" r="6" fill="#54e3a2" />
+</svg>

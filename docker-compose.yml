@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  ramtask:
+    build: .
+    container_name: ramtask-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - JWT_SECRET=ramtask_cambiar_por_tu_clave_secreta_en_produccion_2026
+      - DB_PATH=/app/data/tasks.db
+    volumes:
+      - ./data:/app/data
+
+  # =====================================================================
+  # OPCIONAL: Proxy Caddy para SSL HTTPS Automático en tu dominio
+  # Descomenta este bloque si deseas que Caddy obtenga tu certificado Let's Encrypt automáticamente:
+  # =====================================================================
+  # caddy:
+  #   image: caddy:2-alpine
+  #   container_name: ramtask-caddy
+  #   restart: unless-stopped
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./Caddyfile:/etc/caddy/Caddyfile
+  #     - ./caddy_data:/data
+  #     - ./caddy_config:/config
+  #   depends_on:
+  #     - ramtask

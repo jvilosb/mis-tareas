@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --navy: #00205B;
+  --navy-dark: #071b43;
+  --navy-deep: #0d2f70;
+  --blue: #2b67f6;
+  --blue-soft: #edf3ff;
+  --bg: #F4F6F9;
+  --card: #FFFFFF;
+  --text: #10203A;
+  --muted: #657184;
+  --line: #DBE2E9;
+  --ok: #138a57;
+  --ok-bg: #eaf8f1;
+  --warn: #b97700;
+  --warn-bg: #fff5d9;
+  --down: #c9362b;
+  --down-bg: #fff0ee;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at 10% 0%, rgba(0, 32, 91, 0.08), transparent 24%), linear-gradient(180deg, #f9fbfd 0%, #F4F6F9 100%);
+  color: var(--text);
+  font-family: 'Lato', 'Segoe UI', Arial, sans-serif;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Tipografía de títulos y subtítulos */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Lato', 'Segoe UI', Arial, sans-serif;
+  letter-spacing: -0.025em;
+}
+
+/* Animación de pulso vivo inspirada en status.getram.cl */
+@keyframes getramPulse {
+  0% {
+    transform: scale(0.65);
+    opacity: 1;
+  }
+  75% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.pulse-indicator {
+  position: relative;
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #54e3a2;
+}
+
+.pulse-indicator::after {
+  content: "";
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  bottom: -4px;
+  left: -4px;
+  border-radius: inherit;
+  border: 2px solid rgba(84, 227, 162, 0.45);
+  animation: getramPulse 1.8s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+}
+
+/* Estilos de scrollbar limpios */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #dbe2e9;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #bcc8d8;
+}
+
+/* Soporte para safe area en iPhone (notch e isla dinámica) */
+.safe-bottom {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+.safe-top {
+  padding-top: max(1rem, env(safe-area-inset-top));
+}

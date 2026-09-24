@@ -1,0 +1,6 @@
+# Reemplaza 'tareas.tudominio.com' por tu dominio o subdominio real
+# Caddy obtendrá y renovará automáticamente tu certificado SSL Let's Encrypt gratis.
+
+# tareas.tudominio.com {
+#     reverse_proxy ramtask:3000
+# }
