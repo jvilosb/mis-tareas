@@ -14,7 +14,10 @@ import {
   AlertCircle,
   Shield,
   Apple,
+  Bell,
+  Volume2,
 } from 'lucide-react';
+import { notificationService } from '../../services/notificationService';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -23,7 +26,10 @@ interface SettingsModalProps {
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
   const { user, users, refreshUsers } = useAuth();
-  const [activeTab, setActiveTab] = useState<'family' | 'backup' | 'pwa'>('family');
+  const [activeTab, setActiveTab] = useState<'family' | 'backup' | 'pwa' | 'notifications'>('family');
+  const [notifPermission, setNotifPermission] = useState<NotificationPermission>(
+    notificationService.getPermission()
+  );
 
   // Formulario nuevo familiar
   const [name, setName] = useState('');
@@ -114,6 +120,18 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     reader.readAsText(file);
   };
 
+  const handleEnableNotifications = async () => {
+    const granted = await notificationService.requestPermission();
+    setNotifPermission(granted ? 'granted' : 'denied');
+  };
+
+  const handleTestNotification = async () => {
+    await notificationService.showNotification('🔔 Tareas Metatron', {
+      body: '¡Sonido y alerta en tu iPhone funcionando correctamente!',
+      tag: 'test-notification',
+    });
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#071b43]/60 backdrop-blur-sm animate-fadeIn">
       <div className="bg-white rounded-3xl w-full max-w-xl shadow-2xl border border-[#DBE2E9] overflow-hidden flex flex-col max-h-[90vh]">
@@ -147,17 +165,31 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
             <Users className="w-4 h-4" />
             <span>Familiares ({users.length})</span>
           </button>
+          {user?.role === 'admin' && (
+            <button
+              type="button"
+              onClick={() => setActiveTab('backup')}
+              className={`flex-1 py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 transition-all ${
+                activeTab === 'backup'
+                  ? 'bg-white text-[#00205B] shadow-xs'
+                  : 'text-[#657184] hover:text-[#10203A]'
+              }`}
+            >
+              <Database className="w-4 h-4" />
+              <span>Respaldo</span>
+            </button>
+          )}
           <button
             type="button"
-            onClick={() => setActiveTab('backup')}
+            onClick={() => setActiveTab('notifications')}
             className={`flex-1 py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 transition-all ${
-              activeTab === 'backup'
+              activeTab === 'notifications'
                 ? 'bg-white text-[#00205B] shadow-xs'
                 : 'text-[#657184] hover:text-[#10203A]'
             }`}
           >
-            <Database className="w-4 h-4" />
-            <span>Copia de Seguridad</span>
+            <Bell className="w-4 h-4" />
+            <span>Avisos</span>
           </button>
           <button
             type="button"
@@ -357,8 +389,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
             </div>
           )}
 
-          {/* TAB 2: COPIA DE SEGURIDAD (BACKUP) */}
-          {activeTab === 'backup' && (
+          {/* TAB 2: COPIA DE SEGURIDAD (BACKUP) — solo administradores */}
+          {activeTab === 'backup' && user?.role === 'admin' && (
             <div className="space-y-4">
               <div className="p-4 rounded-2xl bg-blue-50/50 border border-blue-100 text-xs text-[#10203A] leading-relaxed">
                 <span className="font-bold text-[#00205B] block mb-1">
@@ -427,7 +459,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                   </span>
                 </div>
                 <p className="text-[11px] text-[#d9e3f6] leading-relaxed">
-                  RamTask es una Progressive Web App (PWA) de última generación. No necesitas App Store:
+                  Tareas Metatron es una Progressive Web App (PWA) de última generación. No necesitas App Store:
                   se instala directamente en tu pantalla de inicio o dock como una app nativa.
                 </p>
               </div>
@@ -464,6 +496,71 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                       Se creará una app independiente en tu Dock que abre en ventana dedicada sin barras de navegación.
                     </li>
                   </ol>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'notifications' && (
+            <div className="space-y-4 text-xs font-secondary">
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-[#00205B] to-[#0d2f70] text-white">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <Bell className="w-5 h-5 text-[#71a0ff]" />
+                  <span className="font-black text-sm font-main">
+                    Alertas y Notificaciones en tu Teléfono
+                  </span>
+                </div>
+                <p className="text-[11px] text-[#d9e3f6] leading-relaxed">
+                  Recibe avisos visuales, vibración y sonido en tu iPhone cuando tus tareas personales o compartidas estén por vencer.
+                </p>
+              </div>
+
+              {/* Estado del permiso */}
+              <div className="p-4 rounded-2xl border border-[#DBE2E9] bg-white space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="font-black text-xs text-[#00205B]">Estado en este dispositivo:</span>
+                  <span
+                    className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                      notifPermission === 'granted'
+                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                        : notifPermission === 'denied'
+                        ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                        : 'bg-amber-50 text-amber-700 border border-amber-200'
+                    }`}
+                  >
+                    {notifPermission === 'granted'
+                      ? 'Activadas ✅'
+                      : notifPermission === 'denied'
+                      ? 'Bloqueadas ❌'
+                      : 'Sin Activar ⚠️'}
+                  </span>
+                </div>
+
+                {notifPermission !== 'granted' ? (
+                  <button
+                    type="button"
+                    onClick={handleEnableNotifications}
+                    className="w-full py-2.5 px-4 rounded-xl bg-[#00205B] hover:bg-[#071b43] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all"
+                  >
+                    <Bell className="w-4 h-4" />
+                    <span>Activar Notificaciones en este Teléfono</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleTestNotification}
+                    className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all"
+                  >
+                    <Volume2 className="w-4 h-4" />
+                    <span>Probar Alerta y Sonido Ahora</span>
+                  </button>
+                )}
+
+                <div className="text-[11px] text-[#657184] bg-[#F4F6F9] p-3 rounded-xl space-y-1">
+                  <p className="font-bold text-[#10203A]">¿Cómo funcionan en iPhone?</p>
+                  <p>1. En iOS 16.4 o superior, la app debe estar instalada en la <b>Pantalla de Inicio</b> como PWA.</p>
+                  <p>2. Al pulsar el botón de arriba, iOS te pedirá permiso para mostrar avisos en tu pantalla de bloqueo y centro de notificaciones.</p>
+                  <p>3. Cuando crees una tarea con <b>Fecha y Hora</b> (ej. 21:30), la app te avisará con campana y vibración al momento de su vencimiento.</p>
                 </div>
               </div>
             </div>

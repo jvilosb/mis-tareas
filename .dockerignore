@@ -1,0 +1,17 @@
+node_modules
+**/node_modules
+.git
+.gitignore
+data
+backups
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+.env
+.env.*
+!.env.example
+dist
+**/dist
+npm-debug.log*
+yarn-error.log*

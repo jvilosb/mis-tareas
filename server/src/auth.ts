@@ -1,8 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import { db } from './db';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'ramtask_default_jwt_secret_dev_2026';
+// El secreto JWT es obligatorio: si falta, se aborta el arranque en lugar de usar un valor por defecto inseguro.
+const JWT_SECRET_VALUE = process.env.JWT_SECRET;
+if (!JWT_SECRET_VALUE) {
+  throw new Error('[auth] FATAL: falta la variable de entorno JWT_SECRET. Define un secreto largo y aleatorio.');
+}
+const JWT_SECRET: string = JWT_SECRET_VALUE;
 export const COOKIE_NAME = 'ramtask_session';
 
 export interface AuthUser {
@@ -64,11 +70,20 @@ export function requireAuth(req: AuthenticatedRequest, res: Response, next: Next
     return res.status(401).json({ error: 'No autorizado. Inicia sesión para continuar.' });
   }
 
-  const user = verifyToken(token);
-  if (!user) {
+  const payload = verifyToken(token);
+  if (!payload) {
     return res.status(401).json({ error: 'Sesión expirada o inválida.' });
   }
 
-  req.user = user;
+  // Revalidar contra la base de datos: si el usuario fue borrado o cambió de rol, surte efecto de inmediato.
+  const current = db
+    .prepare('SELECT id, username, name, role, color, avatar FROM users WHERE id = ?')
+    .get(payload.id) as AuthUser | undefined;
+
+  if (!current) {
+    return res.status(401).json({ error: 'Sesión inválida. El usuario ya no existe.' });
+  }
+
+  req.user = current;
   next();
 }

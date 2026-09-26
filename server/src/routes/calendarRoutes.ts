@@ -46,7 +46,11 @@ calendarRouter.get('/month', (req: AuthenticatedRequest, res) => {
 
 // 2. Alternar o registrar un turno de trabajo / evento en una fecha específica
 calendarRouter.post('/shift', (req: AuthenticatedRequest, res) => {
-  const targetUserId = req.body.user_id ? Number(req.body.user_id) : req.user!.id;
+  const requestedUserId = req.body.user_id ? Number(req.body.user_id) : req.user!.id;
+  if (req.user?.role !== 'admin' && requestedUserId !== req.user!.id) {
+    return res.status(403).json({ error: 'No puedes modificar el calendario de otro usuario.' });
+  }
+  const targetUserId = requestedUserId;
   const { date, title, color, type, notes } = req.body;
 
   if (!date || !date.match(/^\d{4}-\d{2}-\d{2}$/)) {
@@ -91,7 +95,11 @@ calendarRouter.post('/shift', (req: AuthenticatedRequest, res) => {
 // 3. Generador automático de turnos 2x2 (o N x M)
 // Ideal para cuando la esposa trabaja 2 días seguidos y descansa 2
 calendarRouter.post('/shift/batch-2x2', (req: AuthenticatedRequest, res) => {
-  const targetUserId = req.body.user_id ? Number(req.body.user_id) : req.user!.id;
+  const requestedUserId = req.body.user_id ? Number(req.body.user_id) : req.user!.id;
+  if (req.user?.role !== 'admin' && requestedUserId !== req.user!.id) {
+    return res.status(403).json({ error: 'No puedes generar turnos para otro usuario.' });
+  }
+  const targetUserId = requestedUserId;
   const { start_date, days_count, work_days = 2, rest_days = 2, title } = req.body;
 
   if (!start_date || !start_date.match(/^\d{4}-\d{2}-\d{2}$/)) {
@@ -154,6 +162,10 @@ calendarRouter.delete('/shift/:id', (req: AuthenticatedRequest, res) => {
 
   if (!existing) {
     return res.status(404).json({ error: 'Turno no encontrado.' });
+  }
+
+  if (existing.user_id !== req.user!.id && req.user?.role !== 'admin') {
+    return res.status(403).json({ error: 'No puedes eliminar el turno de otro usuario.' });
   }
 
   db.prepare('DELETE FROM calendar_events WHERE id = ?').run(shiftId);

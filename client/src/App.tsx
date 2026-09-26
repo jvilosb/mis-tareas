@@ -14,7 +14,7 @@ const AppContent: React.FC = () => {
         <div className="bg-white p-6 rounded-3xl border border-[#DBE2E9] shadow-getram flex items-center gap-3">
           <div className="w-5 h-5 rounded-full bg-[#00205B] animate-ping opacity-75" />
           <span className="text-xs font-black uppercase tracking-wider text-[#00205B] font-main">
-            Cargando RamTask...
+            Cargando Tareas Metatron...
           </span>
         </div>
       </div>

@@ -90,7 +90,7 @@ authRouter.post('/setup', async (req, res) => {
     const token = signToken(newUser, true);
     setAuthCookie(res, token, true);
 
-    return res.status(201).json({ user: newUser, token });
+    return res.status(201).json({ user: newUser });
   } catch (error: any) {
     return res.status(500).json({ error: error.message || 'Error al configurar el usuario inicial.' });
   }
@@ -127,7 +127,7 @@ authRouter.post('/login', async (req, res) => {
     const token = signToken(authUser, shouldRemember);
     setAuthCookie(res, token, shouldRemember);
 
-    return res.json({ user: authUser, token });
+    return res.json({ user: authUser });
   } catch (error: any) {
     return res.status(500).json({ error: error.message || 'Error en el inicio de sesión.' });
   }
@@ -147,6 +147,11 @@ authRouter.get('/users', requireAuth, (_req, res) => {
 
 // 6. Crear un nuevo miembro familiar (esposa, hijos)
 authRouter.post('/users', requireAuth, async (req: AuthenticatedRequest, res) => {
+  // Solo un administrador puede crear cuentas
+  if (req.user?.role !== 'admin') {
+    return res.status(403).json({ error: 'Solo un administrador puede agregar familiares.' });
+  }
+
   try {
     const { username, name, password, color, avatar, role } = req.body;
     if (!username || !password || !name) {
@@ -186,9 +191,26 @@ authRouter.post('/users', requireAuth, async (req: AuthenticatedRequest, res) =>
 
 // 7. Eliminar familiar
 authRouter.delete('/users/:id', requireAuth, (req: AuthenticatedRequest, res) => {
+  // Solo un administrador puede eliminar cuentas
+  if (req.user?.role !== 'admin') {
+    return res.status(403).json({ error: 'Solo un administrador puede eliminar usuarios.' });
+  }
+
   const targetId = Number(req.params.id);
   if (targetId === req.user?.id) {
     return res.status(400).json({ error: 'No puedes eliminar tu propia cuenta.' });
+  }
+
+  const target = db.prepare('SELECT role FROM users WHERE id = ?').get(targetId) as { role: string } | undefined;
+  if (!target) {
+    return res.status(404).json({ error: 'Usuario no encontrado.' });
+  }
+
+  if (target.role === 'admin') {
+    const admins = db.prepare("SELECT COUNT(*) as c FROM users WHERE role = 'admin'").get() as { c: number };
+    if (admins.c <= 1) {
+      return res.status(400).json({ error: 'No puedes eliminar al último administrador.' });
+    }
   }
 
   db.prepare('DELETE FROM users WHERE id = ?').run(targetId);

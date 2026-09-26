@@ -6,11 +6,12 @@ services:
     container_name: ramtask-app
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
+    env_file:
+      - .env
     environment:
       - NODE_ENV=production
       - PORT=3000
-      - JWT_SECRET=ramtask_cambiar_por_tu_clave_secreta_en_produccion_2026
       - DB_PATH=/app/data/tasks.db
     volumes:
       - ./data:/app/data

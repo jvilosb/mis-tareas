@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Task } from '../types';
 import { api } from '../services/api';
 import { useAuth } from './AuthContext';
+import { notificationService } from '../services/notificationService';
 
 interface TaskContextType {
   personalTasks: Task[];
@@ -32,6 +33,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ]);
       setPersonalTasks(personalRes.tasks);
       setSharedTasks(sharedRes.tasks);
+      notificationService.checkDueTasks([...personalRes.tasks, ...sharedRes.tasks]);
     } catch (err) {
       console.error('Error al cargar tareas:', err);
     } finally {
@@ -42,10 +44,15 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     if (user) {
       refreshTasks();
+      notificationService.startMonitoring(() => [...personalTasks, ...sharedTasks]);
     } else {
       setPersonalTasks([]);
       setSharedTasks([]);
+      notificationService.stopMonitoring();
     }
+    return () => {
+      notificationService.stopMonitoring();
+    };
   }, [user]);
 
   const createTask = async (data: Partial<Task> & { shared_with_ids?: number[] }) => {

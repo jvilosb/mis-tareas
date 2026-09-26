@@ -2,6 +2,9 @@ import { Task, User, MonthData } from '../types';
 
 const API_BASE = '/api';
 
+// La sesión viaja en una cookie httpOnly (no accesible desde JavaScript).
+// No guardamos el token en localStorage para que un XSS no pueda robar la sesión.
+
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const headers = new Headers(options.headers || {});
   if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
@@ -11,7 +14,7 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
   const response = await fetch(`${API_BASE}${endpoint}`, {
     ...options,
     headers,
-    credentials: 'include', // Para enviar cookies de sesión HTTP-only
+    credentials: 'include', // Envía la cookie de sesión httpOnly
   });
 
   const data = await response.json().catch(() => ({}));
@@ -27,8 +30,8 @@ export const api = {
   // Autenticación y Familia
   auth: {
     me: () => request<{ needsSetup: boolean; user: User | null }>('/auth/me'),
-    setup: (body: any) => request<{ user: User; token: string }>('/auth/setup', { method: 'POST', body: JSON.stringify(body) }),
-    login: (body: any) => request<{ user: User; token: string }>('/auth/login', { method: 'POST', body: JSON.stringify(body) }),
+    setup: (body: any) => request<{ user: User }>('/auth/setup', { method: 'POST', body: JSON.stringify(body) }),
+    login: (body: any) => request<{ user: User }>('/auth/login', { method: 'POST', body: JSON.stringify(body) }),
     logout: () => request<{ success: boolean }>('/auth/logout', { method: 'POST' }),
     getUsers: () => request<{ users: User[] }>('/auth/users'),
     createUser: (body: any) => request<{ user: User }>('/auth/users', { method: 'POST', body: JSON.stringify(body) }),

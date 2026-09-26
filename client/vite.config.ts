@@ -7,16 +7,19 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'icons/*.png'],
+      includeAssets: ['favicon.png', 'favicon.svg', 'icons/*.png'],
       manifest: {
-        name: 'RamTask · Tareas y Turnos',
-        short_name: 'RamTask',
+        name: 'Tareas Metatron',
+        short_name: 'Tareas Metatron',
         description: 'Gestor de tareas personales, compartidas y turnos de trabajo familiares',
         theme_color: '#00205B',
         background_color: '#F4F6F9',
-        display: 'standalone',
-        orientation: 'any',
+        id: '/',
         start_url: '/',
+        scope: '/',
+        display: 'standalone',
+        display_override: ['standalone', 'window-controls-overlay'],
+        orientation: 'any',
         icons: [
           {
             src: '/icons/icon-192.png',

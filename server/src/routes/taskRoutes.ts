@@ -32,7 +32,7 @@ taskRouter.get('/personal', (req: AuthenticatedRequest, res) => {
     params.push(search, search);
   }
 
-  query += ' ORDER BY t.is_completed ASC, CASE t.priority WHEN "urgente" THEN 1 WHEN "alta" THEN 2 WHEN "media" THEN 3 ELSE 4 END, t.due_date ASC, t.created_at DESC';
+  query += ` ORDER BY t.is_completed ASC, CASE t.priority WHEN 'urgente' THEN 1 WHEN 'alta' THEN 2 WHEN 'media' THEN 3 ELSE 4 END, t.due_date ASC, t.created_at DESC`;
 
   const tasks = db.prepare(query).all(...params);
   return res.json({ tasks });
@@ -82,7 +82,7 @@ taskRouter.get('/shared', (req: AuthenticatedRequest, res) => {
     params.push(search, search);
   }
 
-  query += ' ORDER BY t.is_completed ASC, CASE t.priority WHEN "urgente" THEN 1 WHEN "alta" THEN 2 WHEN "media" THEN 3 ELSE 4 END, t.due_date ASC, t.created_at DESC';
+  query += ` ORDER BY t.is_completed ASC, CASE t.priority WHEN 'urgente' THEN 1 WHEN 'alta' THEN 2 WHEN 'media' THEN 3 ELSE 4 END, t.due_date ASC, t.created_at DESC`;
 
   const tasks = db.prepare(query).all(...params) as any[];
 

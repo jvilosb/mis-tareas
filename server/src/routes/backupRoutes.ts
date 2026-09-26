@@ -7,14 +7,19 @@ export const backupRouter = Router();
 backupRouter.use(requireAuth);
 
 // 1. Exportar datos completos en formato JSON
-backupRouter.get('/export', (_req, res) => {
+backupRouter.get('/export', (req: AuthenticatedRequest, res) => {
+  // Solo un administrador puede exportar la totalidad de los datos (incluidas las tareas privadas de todos)
+  if (req.user?.role !== 'admin') {
+    return res.status(403).json({ error: 'Solo un administrador puede exportar la copia de seguridad.' });
+  }
+
   const users = db.prepare('SELECT id, username, name, role, color, avatar, created_at FROM users').all();
   const tasks = db.prepare('SELECT * FROM tasks').all();
   const taskShares = db.prepare('SELECT * FROM task_shares').all();
   const calendarEvents = db.prepare('SELECT * FROM calendar_events').all();
 
   const backupData = {
-    app: 'RamTask',
+    app: 'Tareas Metatron',
     version: '1.0.0',
     exported_at: new Date().toISOString(),
     users,
@@ -24,7 +29,7 @@ backupRouter.get('/export', (_req, res) => {
   };
 
   res.setHeader('Content-Type', 'application/json');
-  res.setHeader('Content-Disposition', `attachment; filename=ramtask_backup_${new Date().toISOString().split('T')[0]}.json`);
+  res.setHeader('Content-Disposition', `attachment; filename=tareas_metatron_backup_${new Date().toISOString().split('T')[0]}.json`);
   return res.json(backupData);
 });
 

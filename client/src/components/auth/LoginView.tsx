@@ -71,10 +71,10 @@ export const LoginView: React.FC = () => {
           <div className="relative z-10 flex flex-col gap-3">
             <div className="flex items-center justify-between">
               {/* Marca */}
-              <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-[#71a0ff] shadow-[0_0_0_5px_rgba(113,160,255,0.2)]" />
+              <div className="flex items-center gap-2.5">
+                <img src="/icons/icon-192.png" alt="Tareas Metatron" className="w-7 h-7 rounded-lg object-cover shadow-xs border border-white/20" />
                 <span className="text-[11px] font-black uppercase tracking-[0.14em] text-[#cddcff]">
-                  RAMTASK · PLATAFORMA
+                  TAREAS METATRON · PLATAFORMA
                 </span>
               </div>
 

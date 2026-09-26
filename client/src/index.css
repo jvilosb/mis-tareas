@@ -21,13 +21,30 @@
   --down-bg: #fff0ee;
 }
 
-body {
+html, body {
   margin: 0;
+  touch-action: pan-x pan-y;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
   background: radial-gradient(circle at 10% 0%, rgba(0, 32, 91, 0.08), transparent 24%), linear-gradient(180deg, #f9fbfd 0%, #F4F6F9 100%);
   color: var(--text);
   font-family: 'Lato', 'Segoe UI', Arial, sans-serif;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Evitar que iOS haga zoom automático al enfocar campos de texto */
+input, select, textarea {
+  font-size: 16px !important;
+  touch-action: manipulation;
+}
+
+button, a {
+  touch-action: manipulation;
 }
 
 /* Tipografía de títulos y subtítulos */

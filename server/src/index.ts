@@ -3,6 +3,7 @@ import path from 'path';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import { initDatabase, db } from './db';
 import { authRouter } from './routes/authRoutes';
@@ -14,6 +15,9 @@ dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Detrás del túnel de Cloudflare: confiar en el proxy para obtener la IP real del cliente
+app.set('trust proxy', 1);
 
 // Inicializar base de datos SQLite
 initDatabase();
@@ -34,6 +38,17 @@ app.use(
 
 app.use(cookieParser());
 app.use(express.json({ limit: '10mb' }));
+
+// Límite de intentos en autenticación para frenar la fuerza bruta
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Demasiados intentos. Inténtalo de nuevo en unos minutos.' },
+});
+app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/setup', authLimiter);
 
 // Rutas de API
 app.use('/api/auth', authRouter);
@@ -62,7 +77,7 @@ app.get('*', (req, res, next) => {
         <html lang="es">
         <head>
           <meta charset="utf-8">
-          <title>RamTask Server</title>
+          <title>Tareas Metatron Server</title>
           <style>
             body { font-family: sans-serif; background: #00205B; color: white; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
             .box { text-align: center; }
@@ -70,7 +85,7 @@ app.get('*', (req, res, next) => {
         </head>
         <body>
           <div class="box">
-            <h1>RamTask Backend Activo</h1>
+            <h1>Tareas Metatron Backend Activo</h1>
             <p>El servidor API está funcionando. Compila el cliente PWA con <code>npm run build:client</code>.</p>
           </div>
         </body>
@@ -81,15 +96,15 @@ app.get('*', (req, res, next) => {
 });
 
 const server = app.listen(PORT, () => {
-  console.log(`[RamTask] Servidor iniciado con éxito en http://localhost:${PORT}`);
+  console.log(`[Tareas Metatron] Servidor iniciado con éxito en http://localhost:${PORT}`);
 });
 
 // Apagado limpio cerrando SQLite
 function gracefulShutdown() {
-  console.log('[RamTask] Cerrando servidor y conexiones SQLite...');
+  console.log('[Tareas Metatron] Cerrando servidor y conexiones SQLite...');
   server.close(() => {
     db.close();
-    console.log('[RamTask] Conexión SQLite cerrada con éxito.');
+    console.log('[Tareas Metatron] Conexión SQLite cerrada con éxito.');
     process.exit(0);
   });
 }

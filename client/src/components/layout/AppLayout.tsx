@@ -17,6 +17,7 @@ import {
   LogOut,
   Plus,
   Shield,
+  Bell,
 } from 'lucide-react';
 
 export const AppLayout: React.FC = () => {
@@ -44,14 +45,14 @@ export const AppLayout: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-[#F4F6F9] selection:bg-[#00205B] selection:text-white pb-24 sm:pb-8">
       {/* Barra de Navegación Superior estilo status.getram.cl */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#DBE2E9] shadow-xs">
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#DBE2E9] shadow-xs pt-[env(safe-area-inset-top)]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
           {/* Logo y Marca */}
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <div className="w-2.5 h-2.5 rounded-full bg-[#2b67f6] shadow-[0_0_0_4px_rgba(43,103,246,0.15)]" />
+            <div className="flex items-center gap-2.5">
+              <img src="/icons/icon-192.png" alt="Tareas Metatron" className="w-7 h-7 rounded-lg object-cover shadow-xs border border-[#DBE2E9]" />
               <span className="text-xs font-black uppercase tracking-[0.14em] text-[#00205B] font-main">
-                RAMTASK
+                TAREAS METATRON
               </span>
             </div>
             <PulseBadge label="SISTEMA ACTIVO" className="hidden sm:inline-flex" />
@@ -131,6 +132,16 @@ export const AppLayout: React.FC = () => {
                 title="Tu color de calendario"
               />
             </div>
+
+            {/* Botón de Notificaciones */}
+            <button
+              type="button"
+              onClick={() => setIsSettingsModalOpen(true)}
+              className="p-2 rounded-xl text-[#657184] hover:text-[#00205B] hover:bg-[#F4F6F9] transition-colors"
+              title="Avisos y Notificaciones"
+            >
+              <Bell className="w-4 h-4" />
+            </button>
 
             {/* Botón de Ajustes */}
             <button
